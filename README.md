@@ -16,12 +16,12 @@ Une plateforme centralisée pour connecter **organisations** et **donateurs**, f
 
 ## 🏗️ Stack technique
 
-| Couche | Technologies |
-|--------|------------|
+| Couche | Technologies                                                |
+|--------|-------------------------------------------------------------|
 | Backend | Spring Boot 3.x, Spring MVC, Spring Security, Spring Data JPA |
-| Base de données | H2 (développement local) |
-| Frontend | Thymeleaf |
-| Outils | IntelliJ IDEA, Postman, Git, Maven, Docker |
+| Base de données | postgresql                                    |
+| Frontend | Thymeleaf                                                   |
+| Outils | IntelliJ IDEA, Postman, Git, Maven, Docker                  |
 
 ---
 
@@ -75,15 +75,14 @@ docker-compose down
 
 ### 🌐 Accès à l'application
 
-| Service | URL |
-|---------|-----|
-| Application | http://localhost:8080 |
-| Console H2 (base de données) | http://localhost:8080/h2-console |
+| Service                   | URL                              |
+|---------------------------|----------------------------------|
+| Application               | http://localhost:8080            |
+| Pgadmin (base de données) | http://localhost:5050/ |
 
 > **Connexion H2 Console :**
-> - JDBC URL : `jdbc:h2:mem:charitedb`
-> - Username : `sa`
-> - Password : *(laisser vide)*
+> - Username : `admin@admin.com`
+> - Password : `admin`
 
 ---
 
