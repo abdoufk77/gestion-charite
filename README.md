@@ -16,12 +16,12 @@ Une plateforme centralisée pour connecter **organisations** et **donateurs**, f
 
 ## 🏗️ Stack technique
 
-| Couche | Technologies                                                |
+| Couche | Technologies |
 |--------|-------------------------------------------------------------|
 | Backend | Spring Boot 3.x, Spring MVC, Spring Security, Spring Data JPA |
-| Base de données | postgresql                                    |
-| Frontend | Thymeleaf                                                   |
-| Outils | IntelliJ IDEA, Postman, Git, Maven, Docker                  |
+| Base de données | postgresql |
+| Frontend | Thymeleaf |
+| Outils | IntelliJ IDEA, Postman, Git, Maven, Docker |
 
 ---
 
@@ -35,6 +35,32 @@ Ce projet nécessite les outils suivants :
 | Maven | 3.9+ | [Télécharger](https://maven.apache.org/) |
 | Docker Desktop | Dernière version | [Télécharger](https://www.docker.com/products/docker-desktop/) |
 | Git | Dernière version | [Télécharger](https://git-scm.com/) |
+
+---
+
+## 📐 Conception
+
+### 📌 Diagramme de cas d'utilisation — Donateur / Explorateur
+
+<img src="docs/diagrams/usecase1.png" alt="Use Case Diagram 1 - Donateur" width="600"/>
+
+> Représente les interactions des acteurs **Explorateur** et **Donateur** avec la plateforme : recherche, filtrage, participation, dons, authentification via Google, et paiement via Stripe / PayPal.
+
+---
+
+### 📌 Diagramme de cas d'utilisation — Admin Organisation
+
+<img src="docs/diagrams/usecase2.png" alt="Use Case Diagram 2 - Admin Organisation" width="600"/>
+
+> Représente les actions de l'**Admin Organisation** et du **Super-Admin** : gestion des actions de charité (CRUD, archivage, import de médias), gestion du profil, et authentification.
+
+---
+
+### 📌 Diagramme de classes
+
+<img src="docs/diagrams/class_diagram.png" alt="Class Diagram" width="600"/>
+
+> Modélisation des entités principales : `Utilisateur`, `Donateur`, `AdminOrganisation`, `SuperAdmin`, `Organisation`, `ActionCharite`, `Don`, `Participation`, et les interfaces de paiement `Strip` / `Paypal`.
 
 ---
 
@@ -75,9 +101,9 @@ docker-compose down
 
 ### 🌐 Accès à l'application
 
-| Service                   | URL                              |
+| Service | URL |
 |---------------------------|----------------------------------|
-| Application               | http://localhost:8080            |
+| Application | http://localhost:8080 |
 | Pgadmin (base de données) | http://localhost:5050/ |
 
 > **Connexion H2 Console :**
@@ -88,9 +114,7 @@ docker-compose down
 
 ## 👥 Équipe
 
-| Nom     | Rôle |
+| Nom | Rôle |
 |---------|------|
-| Abdou   | Développeur |
+| Abdou | Développeur |
 | kaoutar | Développeur |
-
----
