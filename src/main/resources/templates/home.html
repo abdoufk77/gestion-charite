@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Accueil</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="card p-4 shadow">
+        <h3>Bienvenue, <span th:text="${utilisateur.nom}"></span> !</h3>
+        <p>Rôle : <strong th:text="${utilisateur.role}"></strong></p>
+        <p>Email : <span th:text="${utilisateur.email}"></span></p>
+        <a th:href="@{/logout}" class="btn btn-danger mt-3">Se déconnecter</a>
+    </div>
+</div>
+</body>
+</html>
