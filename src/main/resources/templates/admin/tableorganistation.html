@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Organisations</title>
+    <meta charset="UTF-8">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <!-- Titre centré -->
+    <h2 class="text-center mb-4">Demandes d'inscription</h2>
+
+    <table class="table table-bordered table-striped text-center">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Accepter</th>
+            <th>Rejeter</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="org : ${organisations}">
+            <td th:text="${org.id}"></td>
+            <td th:text="${org.name}"></td>
+            <td th:text="${org.email}"></td>
+
+            <!-- Colonne Accepter -->
+            <td>
+                <button class="btn btn-success btn-sm">✔</button>
+            </td>
+
+            <!-- Colonne Rejeter -->
+            <td>
+                <button class="btn btn-danger btn-sm">✖</button>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>

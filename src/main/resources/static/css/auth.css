@@ -1,0 +1,13 @@
+.auth-card {
+    width: 380px;
+    border-radius: 12px;
+}
+
+.auth-card input {
+    padding: 10px;
+    font-size: 14px;
+}
+
+.auth-card h3 {
+    font-weight: bold;
+}
