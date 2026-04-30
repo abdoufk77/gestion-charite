@@ -1,18 +1,90 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Accueil</title>
+    <title>GestionCharité - Accueil</title>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
 </head>
 <body class="bg-light">
-<div class="container mt-5">
-    <div class="card p-4 shadow">
-        <h3>Bienvenue, <span th:text="${utilisateur.nom}"></span> !</h3>
-        <p>Rôle : <strong th:text="${utilisateur.role}"></strong></p>
-        <p>Email : <span th:text="${utilisateur.email}"></span></p>
-        <a th:href="@{/logout}" class="btn btn-danger mt-3">Se déconnecter</a>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <div class="container">
+        <a class="navbar-brand fw-bold" th:href="@{/home}">GestionCharité</a>
+        <div class="ms-auto d-flex gap-2">
+            <th:block th:if="${utilisateur == null}">
+                <a th:href="@{/login}" class="btn btn-outline-light btn-sm">Se connecter</a>
+                <a th:href="@{/register}" class="btn btn-light btn-sm">S'inscrire</a>
+            </th:block>
+            <th:block th:if="${utilisateur != null}">
+                <span class="navbar-text text-white me-3">
+                    Bonjour, <strong th:text="${utilisateur.nom}"></strong>
+                </span>
+                <a th:href="@{/donnateur/dashboard}" class="btn btn-outline-light btn-sm">Mon espace</a>
+                <a th:href="@{/logout}" class="btn btn-danger btn-sm">Déconnexion</a>
+            </th:block>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="bg-success bg-opacity-10 py-5 mb-4">
+    <div class="container text-center">
+        <h1 class="display-5 fw-bold text-success">Actions Caritatives</h1>
+        <p class="lead text-muted">Découvrez les actions en cours et rejoignez-nous pour faire une différence.</p>
+        <th:block th:if="${utilisateur == null}">
+            <a th:href="@{/register}" class="btn btn-success btn-lg me-2">Devenir donateur</a>
+            <a th:href="@{/login}" class="btn btn-outline-success btn-lg">Se connecter</a>
+        </th:block>
     </div>
 </div>
+
+<!-- Liste des actions -->
+<div class="container mb-5">
+    <h4 class="mb-4 text-secondary">Actions disponibles</h4>
+
+    <div th:if="${#lists.isEmpty(actions)}" class="alert alert-info">
+        Aucune action caritative disponible pour le moment.
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${!#lists.isEmpty(actions)}">
+        <div class="col" th:each="action : ${actions}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <span class="badge bg-success mb-2" th:text="${action.categorie}"></span>
+                    <h5 class="card-title" th:text="${action.titre}"></h5>
+                    <p class="card-text text-muted" th:text="${action.description}"></p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Du <span th:text="${#dates.format(action.dateDebut, 'dd/MM/yyyy')}"></span>
+                        au <span th:text="${#dates.format(action.dateFin, 'dd/MM/yyyy')}"></span>
+                    </small>
+
+                    <!-- Visiteur non authentifié -->
+                    <th:block th:if="${utilisateur == null}">
+                        <a th:href="@{/login}" class="btn btn-success btn-sm">
+                            Participer
+                        </a>
+                    </th:block>
+
+                    <!-- Donnateur connecté -->
+                    <th:block th:if="${utilisateur != null}">
+                        <a th:href="@{/donnateur/dashboard}" class="btn btn-success btn-sm">
+                            Participer
+                        </a>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-success text-white text-center py-3">
+    <small>&copy; 2026 GestionCharité</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

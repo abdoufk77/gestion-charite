@@ -26,10 +26,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/home", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/superadmin/**").hasRole("SUPER_ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN_ORGANISATION")
+                .requestMatchers("/donnateur/**").hasRole("DONATEUR")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -58,6 +59,7 @@ public class SecurityConfig {
             String redirectUrl = switch (role) {
                 case "ROLE_SUPER_ADMIN"        -> "/superadmin/dashboard";
                 case "ROLE_ADMIN_ORGANISATION" -> "/admin/dashboard";
+                case "ROLE_DONATEUR"           -> "/donnateur/dashboard";
                 default                        -> "/home";
             };
             response.sendRedirect(redirectUrl);
