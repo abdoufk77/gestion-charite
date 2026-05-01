@@ -1,18 +1,102 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>Dashboard Super Admin</title>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark bg-dark px-4">
+    <span class="navbar-brand fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Super Admin</span>
+    <div class="d-flex align-items-center gap-3">
+        <span class="text-white" th:text="${utilisateur.nom + ' ' + utilisateur.prenom}"></span>
+        <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
+            </button>
+        </form>
+    </div>
+</nav>
+
 <div class="container mt-5">
-    <div class="card p-4 shadow">
-        <h3>Dashboard Super Admin</h3>
-        <p>Connecté en tant que : <strong th:text="${utilisateur.nom}"></strong></p>
-        <p>Email : <span th:text="${utilisateur.email}"></span></p>
-        <a th:href="@{/logout}" class="btn btn-danger mt-3">Se déconnecter</a>
+
+    <!-- Alertes flash -->
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-x-circle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Titre -->
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="mb-0 fw-bold">Demandes d'inscription</h2>
+        <span class="badge bg-warning text-dark ms-3 fs-6"
+              th:text="${pendingOrganisations.size()} + ' en attente'"></span>
+    </div>
+
+    <!-- Table des demandes -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0" th:if="${!pendingOrganisations.isEmpty()}">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Organisation</th>
+                        <th>Contact</th>
+                        <th>Adresse légale</th>
+                        <th>N° Fiscal</th>
+                        <th>Description</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="org : ${pendingOrganisations}">
+                        <td th:text="${org.id}" class="text-muted"></td>
+                        <td class="fw-semibold" th:text="${org.nom}"></td>
+                        <td th:text="${org.contactPrincipal}"></td>
+                        <td th:text="${org.adresseLegale}"></td>
+                        <td th:text="${org.numIdentFiscale}"></td>
+                        <td>
+                            <span th:text="${org.description}" class="text-truncate d-inline-block"
+                                  style="max-width: 180px;" th:title="${org.description}"></span>
+                        </td>
+                        <td class="text-center">
+                            <form th:action="@{/superadmin/organisations/{id}/approuver(id=${org.id})}"
+                                  method="post" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm"
+                                        onclick="return confirm('Approuver cette organisation ?')">
+                                    <i class="bi bi-check-lg me-1"></i>Approuver
+                                </button>
+                            </form>
+                            <form th:action="@{/superadmin/organisations/{id}/rejeter(id=${org.id})}"
+                                  method="post" class="d-inline ms-1">
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Rejeter cette organisation ?')">
+                                    <i class="bi bi-x-lg me-1"></i>Rejeter
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Aucune demande -->
+            <div th:if="${pendingOrganisations.isEmpty()}" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                Aucune demande en attente.
+            </div>
+        </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

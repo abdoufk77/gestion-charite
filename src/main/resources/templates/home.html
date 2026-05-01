@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <title>GestionCharité - Accueil</title>
     <meta charset="UTF-8">
@@ -12,17 +12,30 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-success">
     <div class="container">
         <a class="navbar-brand fw-bold" th:href="@{/home}">GestionCharité</a>
-        <div class="ms-auto d-flex gap-2">
-            <th:block th:if="${utilisateur == null}">
+        <div class="ms-auto d-flex gap-2 align-items-center">
+            <!-- Visiteur non connecté -->
+            <th:block sec:authorize="isAnonymous()">
                 <a th:href="@{/login}" class="btn btn-outline-light btn-sm">Se connecter</a>
                 <a th:href="@{/register}" class="btn btn-light btn-sm">S'inscrire</a>
             </th:block>
-            <th:block th:if="${utilisateur != null}">
-                <span class="navbar-text text-white me-3">
-                    Bonjour, <strong th:text="${utilisateur.nom}"></strong>
+
+            <!-- Utilisateur connecté -->
+            <th:block sec:authorize="isAuthenticated()">
+                <span class="navbar-text text-white me-2">
+                    Bonjour, <strong th:text="${utilisateur != null ? utilisateur.nom : ''}"></strong>
                 </span>
-                <a th:href="@{/donnateur/dashboard}" class="btn btn-outline-light btn-sm">Mon espace</a>
-                <a th:href="@{/logout}" class="btn btn-danger btn-sm">Déconnexion</a>
+                <!-- Lien Mon Espace selon le rôle -->
+                <a sec:authorize="hasRole('SUPER_ADMIN')"
+                   th:href="@{/superadmin/dashboard}" class="btn btn-outline-light btn-sm">Mon espace</a>
+                <a sec:authorize="hasRole('ADMIN_ORGANISATION')"
+                   th:href="@{/admin/dashboard}" class="btn btn-outline-light btn-sm">Mon espace</a>
+                <a sec:authorize="hasRole('DONATEUR')"
+                   th:href="@{/donnateur/dashboard}" class="btn btn-outline-light btn-sm">Mon espace</a>
+
+                <!-- Logout via POST (obligatoire avec Spring Security CSRF) -->
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger btn-sm">Déconnexion</button>
+                </form>
             </th:block>
         </div>
     </div>

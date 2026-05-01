@@ -31,12 +31,8 @@ public class HomeController {
     @GetMapping("/admin/dashboard")
     public String adminDashboard(@AuthenticationPrincipal Utilisateur utilisateur, Model model) {
         model.addAttribute("utilisateur", utilisateur);
+        model.addAttribute("actions", actionChariteRepository.findAll());
         return "admin/dashboard";
     }
 
-    @GetMapping("/superadmin/dashboard")
-    public String superAdminDashboard(@AuthenticationPrincipal Utilisateur utilisateur, Model model) {
-        model.addAttribute("utilisateur", utilisateur);
-        return "superadmin/dashboard";
-    }
 }

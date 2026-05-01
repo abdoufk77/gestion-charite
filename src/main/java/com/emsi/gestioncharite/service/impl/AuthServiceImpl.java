@@ -51,7 +51,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void registerOrganisation(RegisterRequest request) {
-        // Créer l'organisation en attente d'approbation
         Organisation org = new Organisation();
         org.setNom(request.getNomOrganisation());
         org.setAdresseLegale(request.getAdresseLegale());
@@ -61,13 +60,14 @@ public class AuthServiceImpl implements AuthService {
         org.setStatut(StatutOrg.EN_ATTENTE);
         organisationRepository.save(org);
 
-        // Créer le compte AdminOrganisation lié
         AdminOrganisation admin = new AdminOrganisation();
         admin.setNom(request.getNom());
         admin.setPrenom(request.getPrenom());
         admin.setEmail(request.getEmail());
         admin.setMotDePasse(passwordEncoder.encode(request.getPassword()));
         admin.setRole(Role.ADMIN_ORGANISATION);
+        admin.setOrganisation(org);
+        admin.setEnabled(false); // bloqué jusqu'à l'approbation du super admin
         utilisateurRepository.save(admin);
     }
 }
