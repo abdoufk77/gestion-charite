@@ -1,0 +1,68 @@
+/* ── Layout admin global ── */
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.admin-wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+/* ── Sidebar fixe ── */
+.admin-sidebar {
+    width: 220px;
+    min-width: 220px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-right: 1px solid #dee2e6;
+    box-shadow: 2px 0 8px rgba(0,0,0,.06);
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+/* ── Zone principale (à droite de la sidebar) ── */
+.admin-main {
+    margin-left: 220px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── Topbar fixe ── */
+.admin-topbar {
+    flex-shrink: 0;
+    background: #fff;
+    border-bottom: 1px solid #dee2e6;
+    padding: .75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 58px;
+}
+
+/* ── Contenu scrollable ── */
+.admin-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: #f8f9fa;
+}
+
+/* ── Footer fixe ── */
+.admin-footer {
+    flex-shrink: 0;
+    background: #fff;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+    padding: .6rem 1rem;
+    font-size: .8rem;
+    color: #6c757d;
+}

@@ -21,7 +21,15 @@ public class Organisation {
     private String numIdentFiscale;
     private String contactPrincipal;
     private String logoUrl;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(columnDefinition = "TEXT")
+    private String mission;
+
+    private String telephone;
+    private String siteWeb;
 
     @Enumerated(EnumType.STRING)
     private StatutOrg statut;

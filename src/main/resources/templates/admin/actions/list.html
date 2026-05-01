@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mes Actions — Admin Organisation</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/admin-layout.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="admin-wrapper">
+
+    <div th:replace="~{admin/fragments/sidebar :: sidebar('actions')}"></div>
+
+    <div class="admin-main">
+
+        <!-- Topbar -->
+        <div class="admin-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <h5 class="mb-0 fw-bold text-success">
+                    <i class="bi bi-heart-fill me-2"></i>Mes Actions Caritatives
+                </h5>
+                <span class="badge bg-success-subtle text-success fw-normal"
+                      th:text="${pageActions.totalElements} + ' au total'"></span>
+            </div>
+            <a th:href="@{/admin/actions/nouvelle}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Nouvelle action
+            </a>
+        </div>
+
+        <!-- Contenu scrollable -->
+        <div class="admin-content">
+
+            <!-- Flash -->
+            <div th:if="${succes}" class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${succes}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Barre de recherche + filtres -->
+            <form th:action="@{/admin/actions}" method="get" class="card border-0 shadow-sm mb-3 p-3">
+                <div class="row g-2 align-items-end">
+
+                    <!-- Recherche texte -->
+                    <div class="col-12 col-md-5">
+                        <label class="form-label small fw-semibold text-muted mb-1">Recherche</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" name="search" class="form-control border-start-0 ps-0"
+                                   th:value="${search}"
+                                   placeholder="Titre ou description...">
+                        </div>
+                    </div>
+
+                    <!-- Filtre catégorie -->
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-semibold text-muted mb-1">Catégorie</label>
+                        <select name="categorie" class="form-select">
+                            <option value="">Toutes les catégories</option>
+                            <option th:each="cat : ${categories}"
+                                    th:value="${cat}"
+                                    th:text="${cat}"
+                                    th:selected="${cat == categorie}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="col-12 col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-success flex-grow-1">
+                            <i class="bi bi-funnel me-1"></i> Filtrer
+                        </button>
+                        <a th:href="@{/admin/actions}" class="btn btn-outline-secondary"
+                           th:if="${search != '' || categorie != null}" title="Réinitialiser">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+
+            <!-- Résultat filtré info -->
+            <div th:if="${search != '' || categorie != null}" class="text-muted small mb-2">
+                <i class="bi bi-funnel-fill me-1 text-success"></i>
+                Résultats filtrés :
+                <strong th:text="${pageActions.totalElements}"></strong> action(s) trouvée(s)
+                <span th:if="${search != ''}">
+                    pour "<em th:text="${search}"></em>"
+                </span>
+                <span th:if="${categorie != null}">
+                    · catégorie <span class="badge bg-success" th:text="${categorie}"></span>
+                </span>
+            </div>
+
+            <!-- Aucun résultat -->
+            <div th:if="${pageActions.totalElements == 0}" class="text-center py-5">
+                <i class="bi bi-search text-muted" style="font-size:2.5rem;"></i>
+                <p class="text-muted mt-3 mb-3"
+                   th:text="${search != '' || categorie != null} ? 'Aucune action ne correspond à votre recherche.' : 'Aucune action caritative pour le moment.'"></p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a th:if="${search != '' || categorie != null}"
+                       th:href="@{/admin/actions}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-x-circle me-1"></i> Effacer les filtres
+                    </a>
+                    <a th:href="@{/admin/actions/nouvelle}" class="btn btn-success btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Créer une action
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tableau -->
+            <div th:if="${pageActions.totalElements > 0}">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3" style="width:35%">Titre</th>
+                                    <th>Catégorie</th>
+                                    <th>Date début</th>
+                                    <th>Date fin</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="action : ${pageActions.content}">
+                                    <td class="ps-3">
+                                        <span class="fw-semibold" th:text="${action.titre}"></span><br>
+                                        <small class="text-muted"
+                                               th:text="${#strings.abbreviate(action.description, 55)}"></small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success" th:text="${action.categorie}"></span>
+                                    </td>
+                                    <td>
+                                        <small th:text="${#dates.format(action.dateDebut,'dd/MM/yyyy')}"></small>
+                                    </td>
+                                    <td>
+                                        <small th:text="${#dates.format(action.dateFin,'dd/MM/yyyy')}"></small>
+                                    </td>
+                                    <td class="text-center">
+                                        <a th:href="@{'/admin/actions/' + ${action.id} + '/modifier'}"
+                                           class="btn btn-outline-primary btn-sm me-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                data-bs-toggle="modal"
+                                                th:data-bs-target="'#del' + ${action.id}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        <div class="modal fade" th:id="'del' + ${action.id}"
+                                             tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header border-0">
+                                                        <h6 class="modal-title text-danger fw-bold">
+                                                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmer la suppression
+                                                        </h6>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body text-start py-2">
+                                                        Supprimer <strong th:text="${action.titre}"></strong> ?
+                                                        Cette opération est irréversible.
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-secondary btn-sm"
+                                                                data-bs-dismiss="modal">Annuler</button>
+                                                        <form th:action="@{'/admin/actions/' + ${action.id} + '/supprimer'}"
+                                                              method="post" class="d-inline">
+                                                            <input type="hidden" name="page" th:value="${currentPage}">
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                <i class="bi bi-trash me-1"></i>Supprimer
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex align-items-center justify-content-between">
+                    <small class="text-muted">
+                        Page <strong th:text="${currentPage + 1}"></strong>
+                        sur <strong th:text="${pageActions.totalPages}"></strong>
+                        &mdash; <span th:text="${pageActions.totalElements}"></span> résultat(s)
+                    </small>
+
+                    <nav th:if="${pageActions.totalPages > 1}">
+                        <ul class="pagination pagination-sm mb-0">
+
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/admin/actions(page=${currentPage - 1}, search=${search}, categorie=${categorie})}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            <li class="page-item"
+                                th:each="i : ${#numbers.sequence(0, pageActions.totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/admin/actions(page=${i}, search=${search}, categorie=${categorie})}"
+                                   th:text="${i + 1}"></a>
+                            </li>
+
+                            <li class="page-item"
+                                th:classappend="${currentPage + 1 >= pageActions.totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/admin/actions(page=${currentPage + 1}, search=${search}, categorie=${categorie})}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+
+        </div><!-- fin admin-content -->
+
+        <footer class="admin-footer">&copy; 2026 GestionCharité</footer>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

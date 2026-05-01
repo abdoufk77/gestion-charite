@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter @Setter @NoArgsConstructor
 public class AdminOrganisation extends Utilisateur {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;
 }

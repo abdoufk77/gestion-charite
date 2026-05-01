@@ -57,7 +57,7 @@ public class GestionChariteApplication {
             donateur.setMotDePasse(passwordEncoder.encode("test123"));
             donateur.setRole(Role.DONATEUR);
 
-            utilisateurRepository.saveAll(List.of(superAdmin, adminOrg, donateur));
+            utilisateurRepository.saveAll(List.of(superAdmin, donateur));
 
             // Organisation de démo
             Organisation org = new Organisation();
@@ -68,6 +68,10 @@ public class GestionChariteApplication {
             org.setDescription("Organisation dédiée au soutien des communautés vulnérables.");
             org.setStatut(StatutOrg.ACTIVE);
             organisationRepository.save(org);
+
+            // Lier l'admin à l'organisation et sauvegarder
+            adminOrg.setOrganisation(org);
+            utilisateurRepository.save(adminOrg);
 
             // 3 Actions de charité
             ActionCharite action1 = new ActionCharite();

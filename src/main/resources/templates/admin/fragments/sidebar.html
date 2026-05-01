@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="sidebar(activePage)" class="admin-sidebar">
+
+    <!-- Logo -->
+    <div class="px-3 py-4 border-bottom">
+        <a th:href="@{/home}" class="text-decoration-none d-flex align-items-center gap-2">
+            <span class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center"
+                  style="width:34px;height:34px;">
+                <i class="bi bi-heart-fill" style="font-size:.85rem;"></i>
+            </span>
+            <span class="fw-bold text-success fs-6">GestionCharité</span>
+        </a>
+    </div>
+
+    <!-- Avatar -->
+    <div class="px-3 py-3 border-bottom text-center">
+        <div class="bg-success text-white rounded-circle mx-auto d-flex align-items-center justify-content-center mb-2"
+             style="width:48px;height:48px;font-size:1.3rem;">
+            <span th:text="${utilisateur != null ? #strings.substring(utilisateur.nom,0,1).toUpperCase() : 'A'}"></span>
+        </div>
+        <div class="fw-semibold text-dark small" th:text="${utilisateur != null ? utilisateur.nom + ' ' + utilisateur.prenom : ''}"></div>
+        <span class="badge bg-success-subtle text-success" style="font-size:.7rem;">Admin Organisation</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-grow-1 px-2 py-3">
+        <ul class="nav flex-column gap-1">
+
+            <li class="nav-item">
+                <a th:href="@{/admin/dashboard}"
+                   th:classappend="${activePage == 'dashboard'} ? 'active bg-success text-white' : 'text-secondary'"
+                   class="nav-link rounded d-flex align-items-center gap-2 px-3 py-2">
+                    <i class="bi bi-house-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/actions}"
+                   th:classappend="${activePage == 'actions'} ? 'active bg-success text-white' : 'text-secondary'"
+                   class="nav-link rounded d-flex align-items-center gap-2 px-3 py-2">
+                    <i class="bi bi-heart-fill"></i>
+                    <span>Mes Actions</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/profil}"
+                   th:classappend="${activePage == 'profil'} ? 'active bg-success text-white' : 'text-secondary'"
+                   class="nav-link rounded d-flex align-items-center gap-2 px-3 py-2">
+                    <i class="bi bi-person-fill"></i>
+                    <span>Profil</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/admin/organisation/modifier}"
+                   th:classappend="${activePage == 'organisation'} ? 'active bg-success text-white' : 'text-secondary'"
+                   class="nav-link rounded d-flex align-items-center gap-2 px-3 py-2">
+                    <i class="bi bi-building-gear"></i>
+                    <span>Mon Organisation</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+
+    <!-- Déconnexion -->
+    <div class="px-3 py-3 border-top">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2">
+                <i class="bi bi-box-arrow-right"></i> Déconnexion
+            </button>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>
