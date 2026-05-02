@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface DonRepository extends JpaRepository<Don, Integer> {
 
@@ -22,4 +24,9 @@ public interface DonRepository extends JpaRepository<Don, Integer> {
 
     @Query("SELECT COALESCE(SUM(d.montant), 0.0) FROM Don d WHERE d.donateur = :donateur AND d.statut = 'CONFIRME'")
     double sumMontantByDonateur(@Param("donateur") Donateur donateur);
+
+    List<Don> findByActionChariteOrderByDateDonDesc(ActionCharite action);
+
+    @Query("SELECT COALESCE(SUM(d.montant), 0.0) FROM Don d WHERE d.actionCharite.organisation = :org AND d.statut = 'CONFIRME'")
+    double sumMontantByOrganisation(@Param("org") com.emsi.gestioncharite.entity.Organisation org);
 }

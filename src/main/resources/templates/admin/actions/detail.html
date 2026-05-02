@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Détail action</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/admin-layout.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="admin-wrapper">
+    <div th:replace="~{admin/fragments/sidebar :: sidebar('actions')}"></div>
+
+    <div class="admin-main">
+
+        <!-- Topbar -->
+        <div class="admin-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <a th:href="@{/admin/actions}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h5 class="mb-0 fw-bold text-success">
+                    <i class="bi bi-eye me-2"></i>Détail de l'action
+                </h5>
+            </div>
+        </div>
+
+        <div class="admin-content">
+
+            <!-- Flash -->
+            <div th:if="${succes}" class="alert alert-success alert-dismissible fade show mb-3">
+                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${succes}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${erreur}" class="alert alert-danger alert-dismissible fade show mb-3">
+                <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${erreur}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- En-tête action -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <div>
+                            <div class="d-flex gap-2 mb-2">
+                                <span class="badge bg-secondary" th:text="${action.categorie}"></span>
+                                <span th:if="${action.typeAction?.name() == 'FINANCIER'}"
+                                      class="badge bg-success"><i class="bi bi-cash-coin me-1"></i>Collecte financière</span>
+                                <span th:if="${action.typeAction?.name() == 'PHYSIQUE'}"
+                                      class="badge bg-primary"><i class="bi bi-people me-1"></i>Participation physique</span>
+                            </div>
+                            <h5 class="fw-bold mb-1" th:text="${action.titre}"></h5>
+                            <p class="text-muted small mb-0" th:text="${action.description}"></p>
+                        </div>
+                        <div class="text-end text-muted small">
+                            <div><i class="bi bi-calendar3 me-1"></i>
+                                <span th:text="${#dates.format(action.dateDebut,'dd/MM/yyyy')}"></span>
+                                → <span th:text="${#dates.format(action.dateFin,'dd/MM/yyyy')}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barre progression FINANCIER -->
+                    <div th:if="${action.typeAction?.name() == 'FINANCIER' and action.objectifMontant != null}"
+                         th:with="pct=${montantCollecte >= action.objectifMontant ? 100 : montantCollecte * 100 / action.objectifMontant}"
+                         class="mt-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-success fw-semibold">
+                                <span th:text="${#numbers.formatDecimal(montantCollecte, 0, 'COMMA', 0, 'POINT')}"></span> MAD collectés
+                            </span>
+                            <span class="text-muted">
+                                Objectif : <span th:text="${#numbers.formatDecimal(action.objectifMontant, 0, 'COMMA', 0, 'POINT')}"></span> MAD
+                                (<span th:text="${#numbers.formatDecimal(pct, 0, 0)}"></span>%)
+                            </span>
+                        </div>
+                        <div class="progress" style="height:10px;">
+                            <div class="progress-bar bg-success" th:style="'width:' + ${pct} + '%'"></div>
+                        </div>
+                    </div>
+
+                    <!-- Compteur places PHYSIQUE -->
+                    <div th:if="${action.typeAction?.name() == 'PHYSIQUE'}" class="mt-3 d-flex gap-3 flex-wrap">
+                        <span class="badge bg-warning text-dark fs-6 py-2 px-3">
+                            <i class="bi bi-hourglass-split me-1"></i>
+                            <span th:text="${nbEnAttente}"></span> en attente
+                        </span>
+                        <span class="badge bg-success fs-6 py-2 px-3">
+                            <i class="bi bi-check-circle me-1"></i>
+                            <span th:text="${nbConfirmees}"></span> confirmée(s)
+                        </span>
+                        <span class="badge bg-danger fs-6 py-2 px-3">
+                            <i class="bi bi-x-circle me-1"></i>
+                            <span th:text="${nbRefusees}"></span> refusée(s)
+                        </span>
+                        <span th:if="${action.nombrePlacesMax != null}" class="badge bg-secondary fs-6 py-2 px-3">
+                            <i class="bi bi-people me-1"></i>
+                            <span th:text="${nbConfirmees}"></span> / <span th:text="${action.nombrePlacesMax}"></span> places
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════ FINANCIER ═══════════════════════════════ -->
+            <div th:if="${action.typeAction?.name() == 'FINANCIER'}">
+                <h6 class="fw-semibold text-secondary mb-3">
+                    <i class="bi bi-cash-coin me-2 text-success"></i>Liste des dons
+                    <span class="badge bg-success ms-1" th:text="${#lists.size(dons)}"></span>
+                </h6>
+
+                <div th:if="${#lists.isEmpty(dons)}" class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5 text-muted">
+                        <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                        <p class="mt-3 mb-0">Aucun don enregistré pour cette action.</p>
+                    </div>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(dons)}" class="card border-0 shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">#</th>
+                                    <th>Donateur</th>
+                                    <th>Email</th>
+                                    <th class="text-end">Montant</th>
+                                    <th>Méthode</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="don, iter : ${dons}">
+                                    <td class="ps-3 text-muted small" th:text="${iter.count}"></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center"
+                                                 style="width:32px;height:32px;font-size:0.8rem;font-weight:bold;">
+                                                <span th:text="${#strings.substring(don.donateur.prenom,0,1).toUpperCase()}"></span>
+                                            </div>
+                                            <span class="fw-semibold"
+                                                  th:text="${don.donateur.prenom + ' ' + don.donateur.nom}"></span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small" th:text="${don.donateur.email}"></td>
+                                    <td class="text-end fw-bold text-success">
+                                        <span th:text="${#numbers.formatDecimal(don.montant, 0, 'COMMA', 2, 'POINT')}"></span> MAD
+                                    </td>
+                                    <td>
+                                        <span th:if="${don.methodePaiement?.name() == 'STRIPE'}"
+                                              class="badge bg-light text-dark border">
+                                            <i class="bi bi-credit-card-2-front me-1"></i>Stripe
+                                        </span>
+                                        <span th:if="${don.methodePaiement?.name() == 'PAYPAL'}"
+                                              class="badge bg-light text-dark border">
+                                            <i class="bi bi-paypal me-1"></i>PayPal
+                                        </span>
+                                    </td>
+                                    <td class="text-muted small">
+                                        <span th:if="${don.dateDon != null}"
+                                              th:text="${#dates.format(don.dateDon, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:if="${don.statut?.name() == 'CONFIRME'}" class="badge bg-success">Confirmé</span>
+                                        <span th:if="${don.statut?.name() == 'EN_ATTENTE'}" class="badge bg-warning text-dark">En attente</span>
+                                        <span th:if="${don.statut?.name() == 'ANNULE'}" class="badge bg-danger">Annulé</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════ PHYSIQUE ════════════════════════════════ -->
+            <div th:if="${action.typeAction?.name() == 'PHYSIQUE'}">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-semibold text-secondary mb-0">
+                        <i class="bi bi-people me-2 text-primary"></i>Demandes de participation
+                    </h6>
+                    <!-- Filtres onglets -->
+                    <div class="btn-group btn-group-sm">
+                        <a th:href="@{'/admin/actions/' + ${action.id} + '/detail?statut=EN_ATTENTE'}"
+                           class="btn"
+                           th:classappend="${statutFiltre?.name() == 'EN_ATTENTE'} ? 'btn-warning' : 'btn-outline-warning'">
+                            <i class="bi bi-hourglass-split me-1"></i>En attente
+                            <span class="badge bg-white text-warning ms-1" th:text="${nbEnAttente}"></span>
+                        </a>
+                        <a th:href="@{'/admin/actions/' + ${action.id} + '/detail?statut=CONFIRMEE'}"
+                           class="btn"
+                           th:classappend="${statutFiltre?.name() == 'CONFIRMEE'} ? 'btn-success' : 'btn-outline-success'">
+                            <i class="bi bi-check-circle me-1"></i>Confirmées
+                            <span class="badge bg-white text-success ms-1" th:text="${nbConfirmees}"></span>
+                        </a>
+                        <a th:href="@{'/admin/actions/' + ${action.id} + '/detail?statut=REFUSEE'}"
+                           class="btn"
+                           th:classappend="${statutFiltre?.name() == 'REFUSEE'} ? 'btn-danger' : 'btn-outline-danger'">
+                            <i class="bi bi-x-circle me-1"></i>Refusées
+                            <span class="badge bg-white text-danger ms-1" th:text="${nbRefusees}"></span>
+                        </a>
+                    </div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(participations)}" class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5 text-muted">
+                        <i class="bi bi-inbox" style="font-size:2.5rem;"></i>
+                        <p class="mt-3 mb-0">Aucune demande dans cette catégorie.</p>
+                    </div>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(participations)}" class="card border-0 shadow-sm">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">#</th>
+                                    <th>Donateur</th>
+                                    <th>Email</th>
+                                    <th>Date d'inscription</th>
+                                    <th>Statut</th>
+                                    <th th:if="${statutFiltre?.name() == 'EN_ATTENTE'}" class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p, iter : ${participations}">
+                                    <td class="ps-3 text-muted small" th:text="${iter.count}"></td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                                 style="width:32px;height:32px;font-size:0.8rem;font-weight:bold;">
+                                                <span th:text="${#strings.substring(p.donateur.prenom,0,1).toUpperCase()}"></span>
+                                            </div>
+                                            <span class="fw-semibold"
+                                                  th:text="${p.donateur.prenom + ' ' + p.donateur.nom}"></span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small" th:text="${p.donateur.email}"></td>
+                                    <td class="text-muted small">
+                                        <span th:if="${p.dateInscription != null}"
+                                              th:text="${#dates.format(p.dateInscription, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:switch="${p.statut?.name()}">
+                                            <span th:case="'EN_ATTENTE'" class="badge bg-warning text-dark">
+                                                <i class="bi bi-hourglass-split me-1"></i>En attente
+                                            </span>
+                                            <span th:case="'CONFIRMEE'" class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>Confirmée
+                                            </span>
+                                            <span th:case="'REFUSEE'" class="badge bg-danger">
+                                                <i class="bi bi-x-circle me-1"></i>Refusée
+                                            </span>
+                                        </span>
+                                    </td>
+                                    <td th:if="${statutFiltre?.name() == 'EN_ATTENTE'}" class="text-center">
+                                        <form th:action="@{'/admin/actions/participations/' + ${p.id} + '/confirmer'}"
+                                              method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-success btn-sm me-1"
+                                                    title="Confirmer">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+                                        <form th:action="@{'/admin/actions/participations/' + ${p.id} + '/refuser'}"
+                                              method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                    title="Refuser">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- fin admin-content -->
+        <footer class="admin-footer">&copy; 2026 GestionCharité</footer>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

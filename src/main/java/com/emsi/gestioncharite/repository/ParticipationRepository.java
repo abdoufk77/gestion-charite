@@ -7,7 +7,11 @@ import com.emsi.gestioncharite.enums.StatutParticipation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ParticipationRepository extends JpaRepository<Participation, Integer> {
@@ -26,4 +30,14 @@ public interface ParticipationRepository extends JpaRepository<Participation, In
                                                                               Pageable pageable);
 
     long countByDonateurAndStatutNot(Donateur donateur, StatutParticipation statut);
+
+    List<Participation> findByActionChariteOrderByDateInscriptionDesc(ActionCharite actionCharite);
+
+    List<Participation> findByActionChariteAndStatutOrderByDateInscriptionDesc(ActionCharite actionCharite, StatutParticipation statut);
+
+    long countByActionChariteAndStatut(ActionCharite actionCharite, StatutParticipation statut);
+
+    @Query("SELECT COUNT(p) FROM Participation p WHERE p.actionCharite.organisation = :org AND p.statut = :statut")
+    long countByOrganisationAndStatut(@Param("org") com.emsi.gestioncharite.entity.Organisation org,
+                                      @Param("statut") StatutParticipation statut);
 }

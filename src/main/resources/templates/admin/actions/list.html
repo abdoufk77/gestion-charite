@@ -117,7 +117,8 @@
                         <table class="table table-hover mb-0 align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="ps-3" style="width:35%">Titre</th>
+                                    <th class="ps-3" style="width:30%">Titre</th>
+                                    <th>Type</th>
                                     <th>Catégorie</th>
                                     <th>Date début</th>
                                     <th>Date fin</th>
@@ -129,10 +130,16 @@
                                     <td class="ps-3">
                                         <span class="fw-semibold" th:text="${action.titre}"></span><br>
                                         <small class="text-muted"
-                                               th:text="${#strings.abbreviate(action.description, 55)}"></small>
+                                               th:text="${#strings.abbreviate(action.description, 50)}"></small>
                                     </td>
                                     <td>
-                                        <span class="badge bg-success" th:text="${action.categorie}"></span>
+                                        <span th:if="${action.typeAction?.name() == 'FINANCIER'}"
+                                              class="badge bg-success"><i class="bi bi-cash-coin me-1"></i>Financier</span>
+                                        <span th:if="${action.typeAction?.name() == 'PHYSIQUE'}"
+                                              class="badge bg-primary"><i class="bi bi-people me-1"></i>Physique</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary" th:text="${action.categorie}"></span>
                                     </td>
                                     <td>
                                         <small th:text="${#dates.format(action.dateDebut,'dd/MM/yyyy')}"></small>
@@ -141,6 +148,10 @@
                                         <small th:text="${#dates.format(action.dateFin,'dd/MM/yyyy')}"></small>
                                     </td>
                                     <td class="text-center">
+                                        <a th:href="@{'/admin/actions/' + ${action.id} + '/detail'}"
+                                           class="btn btn-outline-success btn-sm me-1" title="Voir les donateurs">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                         <a th:href="@{'/admin/actions/' + ${action.id} + '/modifier'}"
                                            class="btn btn-outline-primary btn-sm me-1">
                                             <i class="bi bi-pencil"></i>

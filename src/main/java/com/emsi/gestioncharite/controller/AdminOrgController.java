@@ -3,9 +3,14 @@ package com.emsi.gestioncharite.controller;
 import com.emsi.gestioncharite.dto.request.ActionChariteRequest;
 import com.emsi.gestioncharite.entity.ActionCharite;
 import com.emsi.gestioncharite.entity.AdminOrganisation;
+import com.emsi.gestioncharite.entity.Participation;
 import com.emsi.gestioncharite.enums.Categorie;
+import com.emsi.gestioncharite.enums.StatutParticipation;
 import com.emsi.gestioncharite.enums.TypeAction;
+import com.emsi.gestioncharite.repository.DonRepository;
+import com.emsi.gestioncharite.repository.ParticipationRepository;
 import com.emsi.gestioncharite.service.ActionChariteService;
+import com.emsi.gestioncharite.service.DonService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +31,9 @@ public class AdminOrgController {
     private static final int PAGE_SIZE = 6;
 
     private final ActionChariteService actionChariteService;
+    private final DonService donService;
+    private final DonRepository donRepository;
+    private final ParticipationRepository participationRepository;
 
     @GetMapping
     public String liste(@AuthenticationPrincipal AdminOrganisation admin,
@@ -146,5 +154,69 @@ public class AdminOrgController {
         actionChariteService.supprimer(id, admin);
         redirectAttributes.addFlashAttribute("succes", "Action supprimée avec succès !");
         return "redirect:/admin/actions?page=" + page;
+    }
+
+    // ── Détail action (dons ou participations) ────────────────────────────────
+
+    @GetMapping("/{id}/detail")
+    public String detail(@PathVariable int id,
+                         @AuthenticationPrincipal AdminOrganisation admin,
+                         @RequestParam(required = false) StatutParticipation statut,
+                         Model model) {
+        ActionCharite action = actionChariteService.getActionByIdAndAdmin(id, admin);
+        model.addAttribute("action", action);
+        model.addAttribute("utilisateur", admin);
+
+        if (action.getTypeAction() == TypeAction.FINANCIER) {
+            model.addAttribute("dons", donRepository.findByActionChariteOrderByDateDonDesc(action));
+            model.addAttribute("montantCollecte", donService.getMontantCollecte(action));
+
+        } else if (action.getTypeAction() == TypeAction.PHYSIQUE) {
+            StatutParticipation filtreActif = statut != null ? statut : StatutParticipation.EN_ATTENTE;
+            model.addAttribute("participations",
+                    participationRepository.findByActionChariteAndStatutOrderByDateInscriptionDesc(action, filtreActif));
+            model.addAttribute("nbEnAttente",
+                    participationRepository.countByActionChariteAndStatut(action, StatutParticipation.EN_ATTENTE));
+            model.addAttribute("nbConfirmees",
+                    participationRepository.countByActionChariteAndStatut(action, StatutParticipation.CONFIRMEE));
+            model.addAttribute("nbRefusees",
+                    participationRepository.countByActionChariteAndStatut(action, StatutParticipation.REFUSEE));
+            model.addAttribute("statutFiltre", filtreActif);
+        }
+        return "admin/actions/detail";
+    }
+
+    // ── Confirmer / Refuser une participation ─────────────────────────────────
+
+    @PostMapping("/participations/{participationId}/confirmer")
+    public String confirmerParticipation(@PathVariable int participationId,
+                                         @AuthenticationPrincipal AdminOrganisation admin,
+                                         RedirectAttributes redirectAttributes) {
+        Participation p = participationRepository.findById(participationId)
+                .orElseThrow(() -> new RuntimeException("Participation introuvable"));
+        verifierAppartenance(p, admin);
+        p.setStatut(StatutParticipation.CONFIRMEE);
+        participationRepository.save(p);
+        redirectAttributes.addFlashAttribute("succes", "Participation confirmée !");
+        return "redirect:/admin/actions/" + p.getActionCharite().getId() + "/detail?statut=EN_ATTENTE";
+    }
+
+    @PostMapping("/participations/{participationId}/refuser")
+    public String refuserParticipation(@PathVariable int participationId,
+                                       @AuthenticationPrincipal AdminOrganisation admin,
+                                       RedirectAttributes redirectAttributes) {
+        Participation p = participationRepository.findById(participationId)
+                .orElseThrow(() -> new RuntimeException("Participation introuvable"));
+        verifierAppartenance(p, admin);
+        p.setStatut(StatutParticipation.REFUSEE);
+        participationRepository.save(p);
+        redirectAttributes.addFlashAttribute("succes", "Participation refusée.");
+        return "redirect:/admin/actions/" + p.getActionCharite().getId() + "/detail?statut=EN_ATTENTE";
+    }
+
+    private void verifierAppartenance(Participation p, AdminOrganisation admin) {
+        if (p.getActionCharite().getOrganisation().getId() != admin.getOrganisation().getId()) {
+            throw new RuntimeException("Accès refusé");
+        }
     }
 }
