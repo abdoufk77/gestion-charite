@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mes participations</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div th:replace="~{donnateur/fragments/navbar :: navbar('participations')}"></div>
+
+<div class="container mt-4 mb-5">
+
+    <!-- Alertes flash -->
+    <div th:if="${succes}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-1"></i>
+        <span th:text="${succes}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${erreur}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        <span th:text="${erreur}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h4 class="fw-bold mb-0">
+            <i class="bi bi-people text-primary me-2"></i>Mes participations
+        </h4>
+        <span class="badge bg-primary fs-6"
+              th:text="${pageParticipations.totalElements + ' participation(s)'}"></span>
+    </div>
+
+    <!-- Liste vide -->
+    <div th:if="${pageParticipations.totalElements == 0}" class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5 text-muted">
+            <i class="bi bi-people" style="font-size:3rem;"></i>
+            <p class="mt-3 mb-0">Vous n'avez encore participé à aucune action physique.</p>
+            <a th:href="@{/donnateur/dashboard}" class="btn btn-primary mt-3">
+                <i class="bi bi-heart-fill me-1"></i>Voir les actions disponibles
+            </a>
+        </div>
+    </div>
+
+    <!-- Cartes participations -->
+    <div th:if="${pageParticipations.totalElements > 0}"
+         class="row row-cols-1 row-cols-md-2 g-4">
+
+        <div class="col" th:each="p : ${pageParticipations.content}">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+
+                    <!-- Titre + organisation -->
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="fw-bold mb-1" th:text="${p.actionCharite.titre}"></h6>
+                            <small class="text-muted">
+                                <i class="bi bi-building me-1"></i>
+                                <span th:text="${p.actionCharite.organisation != null ? p.actionCharite.organisation.nom : '—'}"></span>
+                            </small>
+                        </div>
+                        <!-- Badge statut -->
+                        <span th:switch="${p.statut.name()}">
+                            <span th:case="'EN_ATTENTE'" class="badge bg-warning text-dark">
+                                <i class="bi bi-hourglass-split me-1"></i>En attente
+                            </span>
+                            <span th:case="'CONFIRMEE'" class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Confirmée
+                            </span>
+                            <span th:case="'REFUSEE'" class="badge bg-danger">
+                                <i class="bi bi-x-circle me-1"></i>Refusée
+                            </span>
+                            <span th:case="'ANNULEE'" class="badge bg-secondary">
+                                <i class="bi bi-slash-circle me-1"></i>Annulée
+                            </span>
+                        </span>
+                    </div>
+
+                    <!-- Dates action -->
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        Action du
+                        <span th:text="${#dates.format(p.actionCharite.dateDebut, 'dd/MM/yyyy')}"></span>
+                        au
+                        <span th:text="${#dates.format(p.actionCharite.dateFin, 'dd/MM/yyyy')}"></span>
+                    </p>
+
+                    <!-- Date inscription -->
+                    <p class="text-muted small mb-0" th:if="${p.dateInscription != null}">
+                        <i class="bi bi-clock me-1"></i>
+                        Inscrit le
+                        <span th:text="${#dates.format(p.dateInscription, 'dd/MM/yyyy à HH:mm')}"></span>
+                    </p>
+                </div>
+
+                <!-- Bouton annuler -->
+                <div class="card-footer bg-transparent d-flex justify-content-end"
+                     th:if="${p.statut.name() == 'EN_ATTENTE' or p.statut.name() == 'CONFIRMEE'}">
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            data-bs-toggle="modal"
+                            th:attr="data-bs-target='#modal-annuler-' + ${p.id}">
+                        <i class="bi bi-x-circle me-1"></i>Annuler ma participation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal confirmation annulation -->
+            <div th:if="${p.statut.name() == 'EN_ATTENTE' or p.statut.name() == 'CONFIRMEE'}"
+                 class="modal fade"
+                 th:id="'modal-annuler-' + ${p.id}"
+                 tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <div class="modal-header border-0">
+                            <h6 class="modal-title fw-bold">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                Confirmer l'annulation
+                            </h6>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-muted">
+                            Voulez-vous vraiment annuler votre participation à
+                            <strong th:text="${p.actionCharite.titre}"></strong> ?
+                            <br><small class="text-danger mt-1 d-block">Cette action est irréversible.</small>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                                Non, garder
+                            </button>
+                            <form th:action="@{'/donnateur/participations/' + ${p.id} + '/annuler'}" method="post">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-x-circle me-1"></i>Oui, annuler
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Pagination -->
+    <div th:if="${pageParticipations.totalPages > 1}"
+         class="d-flex justify-content-center gap-2 mt-4">
+        <a th:href="@{/donnateur/participations(page=${currentPage - 1})}"
+           th:classappend="${currentPage == 0} ? 'disabled'"
+           class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <span th:each="i : ${#numbers.sequence(0, pageParticipations.totalPages - 1)}">
+            <a th:href="@{/donnateur/participations(page=${i})}"
+               class="btn btn-sm"
+               th:classappend="${i == currentPage} ? 'btn-primary' : 'btn-outline-secondary'"
+               th:text="${i + 1}"></a>
+        </span>
+        <a th:href="@{/donnateur/participations(page=${currentPage + 1})}"
+           th:classappend="${currentPage == pageParticipations.totalPages - 1} ? 'disabled'"
+           class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </div>
+
+</div>
+
+<footer class="bg-success text-white text-center py-3">
+    <small>&copy; 2026 GestionCharité</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

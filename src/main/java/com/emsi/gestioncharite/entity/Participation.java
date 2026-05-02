@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Participation {
@@ -16,6 +18,9 @@ public class Participation {
 
     @Enumerated(EnumType.STRING)
     private StatutParticipation statut = StatutParticipation.EN_ATTENTE;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateInscription;
 
     @ManyToOne
     @JoinColumn(name = "action_charite_id")

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Faire un don</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<div th:replace="~{donnateur/fragments/navbar :: navbar('home')}"></div>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <!-- Récapitulatif action -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <span class="badge bg-secondary mb-2" th:text="${action.categorie}"></span>
+                    <h5 class="fw-bold" th:text="${action.titre}"></h5>
+                    <p class="text-muted small mb-2" th:text="${action.description}"></p>
+                    <p class="mb-1 small">
+                        <i class="bi bi-building me-1 text-success"></i>
+                        <span th:text="${action.organisation.nom}"></span>
+                    </p>
+
+                    <!-- Progression actuelle -->
+                    <div th:if="${action.objectifMontant != null}"
+                         th:with="pct=${montantCollecte >= action.objectifMontant ? 100 : montantCollecte * 100 / action.objectifMontant}">
+                        <div class="d-flex justify-content-between small mt-3 mb-1">
+                            <span class="text-success fw-semibold">
+                                <span th:text="${#numbers.formatDecimal(montantCollecte, 0, 'COMMA', 0, 'POINT')}"></span> MAD collectés
+                            </span>
+                            <span class="text-muted">
+                                Objectif : <span th:text="${#numbers.formatDecimal(action.objectifMontant, 0, 'COMMA', 0, 'POINT')}"></span> MAD
+                            </span>
+                        </div>
+                        <div class="progress mb-1" style="height:10px;">
+                            <div class="progress-bar bg-success"
+                                 th:style="'width:' + ${pct} + '%'"></div>
+                        </div>
+                        <div class="text-end small text-muted">
+                            <span th:text="${#numbers.formatDecimal(pct, 0, 0)}"></span>%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire de don -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-1">
+                        <i class="bi bi-cash-coin text-success me-2"></i>Votre don
+                    </h5>
+                    <p class="text-muted small mb-4">
+                        Mode simulation — aucun vrai paiement effectué
+                        <span class="badge bg-warning text-dark ms-1">DEMO</span>
+                    </p>
+
+                    <!-- Alerte erreur -->
+                    <div th:if="${erreur}" class="alert alert-danger alert-dismissible fade show small" role="alert">
+                        <span th:text="${erreur}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <form th:action="@{'/donnateur/actions/' + ${action.id} + '/don'}" method="post">
+
+                        <!-- Montant -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Montant (MAD) <span class="text-danger">*</span></label>
+                            <!-- Montants suggérés -->
+                            <div class="d-flex gap-2 mb-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="setMontant(100)">100</button>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="setMontant(500)">500</button>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="setMontant(1000)">1 000</button>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="setMontant(5000)">5 000</button>
+                            </div>
+                            <input type="number" id="montant" name="montant" class="form-control"
+                                   min="1" step="0.01" placeholder="Ou entrez un montant personnalisé" required>
+                        </div>
+
+                        <!-- Méthode de paiement -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Méthode de paiement <span class="text-danger">*</span></label>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="methode" id="methode-stripe"
+                                           value="STRIPE" required>
+                                    <label class="btn btn-outline-secondary w-100 py-3" for="methode-stripe">
+                                        <i class="bi bi-credit-card-2-front d-block mb-1" style="font-size:1.5rem;"></i>
+                                        <span class="fw-semibold">Stripe</span>
+                                        <br><small class="text-muted">Carte bancaire</small>
+                                    </label>
+                                </div>
+                                <div class="col-6">
+                                    <input type="radio" class="btn-check" name="methode" id="methode-paypal"
+                                           value="PAYPAL">
+                                    <label class="btn btn-outline-secondary w-100 py-3" for="methode-paypal">
+                                        <i class="bi bi-paypal d-block mb-1" style="font-size:1.5rem;"></i>
+                                        <span class="fw-semibold">PayPal</span>
+                                        <br><small class="text-muted">Compte PayPal</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-heart-fill me-2"></i>Confirmer le don
+                            </button>
+                            <a th:href="@{/donnateur/dashboard}" class="btn btn-outline-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer class="bg-success text-white text-center py-3 mt-5">
+    <small>&copy; 2026 GestionCharité</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function setMontant(val) {
+        document.getElementById('montant').value = val;
+    }
+</script>
+</body>
+</html>

@@ -1,5 +1,7 @@
 package com.emsi.gestioncharite.entity;
 
+import com.emsi.gestioncharite.enums.MethodePaiement;
+import com.emsi.gestioncharite.enums.StatutDon;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,8 +19,16 @@ public class Don {
 
     private double montant;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date dateDon;
+
+    @Enumerated(EnumType.STRING)
+    private StatutDon statut = StatutDon.EN_ATTENTE;
+
+    @Enumerated(EnumType.STRING)
+    private MethodePaiement methodePaiement;
+
+    private String transactionId;
 
     @ManyToOne
     @JoinColumn(name = "action_charite_id")

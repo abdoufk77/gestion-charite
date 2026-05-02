@@ -25,13 +25,6 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/donnateur/dashboard")
-    public String donateurDashboard(@AuthenticationPrincipal Utilisateur utilisateur, Model model) {
-        model.addAttribute("utilisateur", utilisateur);
-        model.addAttribute("actions", actionChariteRepository.findAll());
-        return "donnateur/dashboard";
-    }
-
     @GetMapping("/admin/dashboard")
     public String adminDashboard(@AuthenticationPrincipal AdminOrganisation admin,
                                  @RequestParam(defaultValue = "0") int page,
