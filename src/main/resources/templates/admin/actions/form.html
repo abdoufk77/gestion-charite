@@ -76,7 +76,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
+                                <div class="mb-3">
                                     <label class="form-label fw-semibold">Catégorie <span class="text-danger">*</span></label>
                                     <select class="form-select"
                                             th:field="*{categorie}"
@@ -87,7 +87,47 @@
                                     <div class="invalid-feedback" th:errors="*{categorie}"></div>
                                 </div>
 
-                                <div class="d-grid gap-2">
+                                <!-- Type d'action -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Type d'action <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-3">
+                                        <div th:each="type : ${typesAction}" class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                   th:id="'type_' + ${type}"
+                                                   th:field="*{typeAction}"
+                                                   th:value="${type}"
+                                                   onchange="toggleTypeFields()">
+                                            <label class="form-check-label d-flex align-items-center gap-1"
+                                                   th:for="'type_' + ${type}">
+                                                <i class="bi" th:classappend="${type.name() == 'FINANCIER'} ? 'bi-cash-coin text-success' : 'bi-people-fill text-primary'"></i>
+                                                <span th:text="${type.name() == 'FINANCIER'} ? 'Collecte financière' : 'Participation physique'"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('typeAction')}" th:errors="*{typeAction}"></div>
+                                </div>
+
+                                <!-- Champ conditionnel FINANCIER -->
+                                <div id="champ-financier" class="mb-3" style="display:none;">
+                                    <label class="form-label fw-semibold">Objectif financier (MAD) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="1" class="form-control"
+                                           th:field="*{objectifMontant}"
+                                           th:classappend="${#fields.hasErrors('objectifMontant')} ? 'is-invalid'"
+                                           placeholder="Ex: 50000">
+                                    <div class="invalid-feedback" th:errors="*{objectifMontant}"></div>
+                                </div>
+
+                                <!-- Champ conditionnel PHYSIQUE -->
+                                <div id="champ-physique" class="mb-3" style="display:none;">
+                                    <label class="form-label fw-semibold">Nombre de places maximum <span class="text-danger">*</span></label>
+                                    <input type="number" min="1" class="form-control"
+                                           th:field="*{nombrePlacesMax}"
+                                           th:classappend="${#fields.hasErrors('nombrePlacesMax')} ? 'is-invalid'"
+                                           placeholder="Ex: 30">
+                                    <div class="invalid-feedback" th:errors="*{nombrePlacesMax}"></div>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
                                     <button type="submit" class="btn btn-success">
                                         <i class="bi bi-plus-circle me-1"></i> Créer l'action
                                     </button>
@@ -133,7 +173,7 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-4">
+                                <div class="mb-3">
                                     <label class="form-label fw-semibold">Catégorie <span class="text-danger">*</span></label>
                                     <select class="form-select"
                                             th:field="*{categorie}"
@@ -143,7 +183,47 @@
                                     <div class="invalid-feedback" th:errors="*{categorie}"></div>
                                 </div>
 
-                                <div class="d-grid gap-2">
+                                <!-- Type d'action -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Type d'action <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-3">
+                                        <div th:each="type : ${typesAction}" class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                   th:id="'type_edit_' + ${type}"
+                                                   th:field="*{typeAction}"
+                                                   th:value="${type}"
+                                                   onchange="toggleTypeFields()">
+                                            <label class="form-check-label d-flex align-items-center gap-1"
+                                                   th:for="'type_edit_' + ${type}">
+                                                <i class="bi" th:classappend="${type.name() == 'FINANCIER'} ? 'bi-cash-coin text-success' : 'bi-people-fill text-primary'"></i>
+                                                <span th:text="${type.name() == 'FINANCIER'} ? 'Collecte financière' : 'Participation physique'"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('typeAction')}" th:errors="*{typeAction}"></div>
+                                </div>
+
+                                <!-- Champ conditionnel FINANCIER -->
+                                <div id="champ-financier" class="mb-3" style="display:none;">
+                                    <label class="form-label fw-semibold">Objectif financier (MAD) <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="1" class="form-control"
+                                           th:field="*{objectifMontant}"
+                                           th:classappend="${#fields.hasErrors('objectifMontant')} ? 'is-invalid'"
+                                           placeholder="Ex: 50000">
+                                    <div class="invalid-feedback" th:errors="*{objectifMontant}"></div>
+                                </div>
+
+                                <!-- Champ conditionnel PHYSIQUE -->
+                                <div id="champ-physique" class="mb-3" style="display:none;">
+                                    <label class="form-label fw-semibold">Nombre de places maximum <span class="text-danger">*</span></label>
+                                    <input type="number" min="1" class="form-control"
+                                           th:field="*{nombrePlacesMax}"
+                                           th:classappend="${#fields.hasErrors('nombrePlacesMax')} ? 'is-invalid'"
+                                           placeholder="Ex: 30">
+                                    <div class="invalid-feedback" th:errors="*{nombrePlacesMax}"></div>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-save me-1"></i> Enregistrer les modifications
                                     </button>
@@ -162,5 +242,14 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleTypeFields() {
+        const selected = document.querySelector('input[name="typeAction"]:checked');
+        const type = selected ? selected.value : null;
+        document.getElementById('champ-financier').style.display = (type === 'FINANCIER') ? 'block' : 'none';
+        document.getElementById('champ-physique').style.display = (type === 'PHYSIQUE') ? 'block' : 'none';
+    }
+    document.addEventListener('DOMContentLoaded', toggleTypeFields);
+</script>
 </body>
 </html>

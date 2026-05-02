@@ -64,7 +64,9 @@ public class ActionChariteServiceImpl implements ActionChariteService {
         action.setDateDebut(request.getDateDebut());
         action.setDateFin(request.getDateFin());
         action.setCategorie(request.getCategorie());
+        action.setTypeAction(request.getTypeAction());
         action.setOrganisation(admin.getOrganisation());
+        appliquerChampsConditionnels(action, request);
         actionChariteRepository.save(action);
     }
 
@@ -77,7 +79,22 @@ public class ActionChariteServiceImpl implements ActionChariteService {
         action.setDateDebut(request.getDateDebut());
         action.setDateFin(request.getDateFin());
         action.setCategorie(request.getCategorie());
+        action.setTypeAction(request.getTypeAction());
+        appliquerChampsConditionnels(action, request);
         actionChariteRepository.save(action);
+    }
+
+    private void appliquerChampsConditionnels(ActionCharite action, ActionChariteRequest request) {
+        switch (request.getTypeAction()) {
+            case FINANCIER -> {
+                action.setObjectifMontant(request.getObjectifMontant());
+                action.setNombrePlacesMax(null);
+            }
+            case PHYSIQUE -> {
+                action.setNombrePlacesMax(request.getNombrePlacesMax());
+                action.setObjectifMontant(null);
+            }
+        }
     }
 
     @Override

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class Don {
@@ -14,6 +16,9 @@ public class Don {
     private int id;
 
     private double montant;
+
+    @Temporal(TemporalType.DATE)
+    private Date dateDon;
 
     @ManyToOne
     @JoinColumn(name = "action_charite_id")

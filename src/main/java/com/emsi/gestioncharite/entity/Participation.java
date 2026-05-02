@@ -1,5 +1,6 @@
 package com.emsi.gestioncharite.entity;
 
+import com.emsi.gestioncharite.enums.StatutParticipation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +14,8 @@ public class Participation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String lieu;
+    @Enumerated(EnumType.STRING)
+    private StatutParticipation statut = StatutParticipation.EN_ATTENTE;
 
     @ManyToOne
     @JoinColumn(name = "action_charite_id")

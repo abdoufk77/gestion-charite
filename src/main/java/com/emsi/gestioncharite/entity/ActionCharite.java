@@ -1,6 +1,7 @@
 package com.emsi.gestioncharite.entity;
 
 import com.emsi.gestioncharite.enums.Categorie;
+import com.emsi.gestioncharite.enums.TypeAction;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,15 @@ public class ActionCharite {
 
     @Enumerated(EnumType.STRING)
     private Categorie categorie;
+
+    @Enumerated(EnumType.STRING)
+    private TypeAction typeAction;
+
+    // Renseigné uniquement si typeAction == FINANCIER
+    private Double objectifMontant;
+
+    // Renseigné uniquement si typeAction == PHYSIQUE
+    private Integer nombrePlacesMax;
 
     @ManyToOne
     @JoinColumn(name = "organisation_id")
