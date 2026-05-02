@@ -54,6 +54,11 @@
     <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${!#lists.isEmpty(actions)}">
         <div class="col" th:each="action : ${actions}" th:if="${action.typeAction != null}">
             <div class="card h-100 shadow-sm border-0">
+                <!-- Image de l'action -->
+                <img th:src="${action.imageUrl != null ? action.imageUrl : '/images/default-action.svg'}"
+                     class="card-img-top"
+                     style="height:160px;object-fit:cover;"
+                     th:alt="${action.titre}">
                 <div class="card-body pb-2">
                     <!-- Badges catégorie + type -->
                     <div class="d-flex gap-2 mb-2 flex-wrap">

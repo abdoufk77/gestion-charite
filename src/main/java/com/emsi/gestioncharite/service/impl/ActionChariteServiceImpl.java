@@ -8,18 +8,29 @@ import com.emsi.gestioncharite.enums.Categorie;
 import com.emsi.gestioncharite.repository.ActionChariteRepository;
 import com.emsi.gestioncharite.service.ActionChariteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ActionChariteServiceImpl implements ActionChariteService {
 
     private final ActionChariteRepository actionChariteRepository;
+
+    @Value("${app.upload.dir:uploads}")
+    private String uploadDir;
 
     @Override
     public Page<ActionCharite> getActionsByAdmin(AdminOrganisation admin, int page, int size) {
@@ -67,6 +78,9 @@ public class ActionChariteServiceImpl implements ActionChariteService {
         action.setTypeAction(request.getTypeAction());
         action.setOrganisation(admin.getOrganisation());
         appliquerChampsConditionnels(action, request);
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            action.setImageUrl(sauvegarderImage(request.getImage()));
+        }
         actionChariteRepository.save(action);
     }
 
@@ -81,7 +95,25 @@ public class ActionChariteServiceImpl implements ActionChariteService {
         action.setCategorie(request.getCategorie());
         action.setTypeAction(request.getTypeAction());
         appliquerChampsConditionnels(action, request);
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            action.setImageUrl(sauvegarderImage(request.getImage()));
+        }
         actionChariteRepository.save(action);
+    }
+
+    private String sauvegarderImage(MultipartFile file) {
+        try {
+            Path dossier = Paths.get(uploadDir, "actions");
+            Files.createDirectories(dossier);
+            String ext = file.getOriginalFilename() != null && file.getOriginalFilename().contains(".")
+                    ? file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.'))
+                    : ".jpg";
+            String nomFichier = UUID.randomUUID() + ext;
+            Files.copy(file.getInputStream(), dossier.resolve(nomFichier));
+            return "/uploads/actions/" + nomFichier;
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de l'enregistrement de l'image", e);
+        }
     }
 
     private void appliquerChampsConditionnels(ActionCharite action, ActionChariteRequest request) {

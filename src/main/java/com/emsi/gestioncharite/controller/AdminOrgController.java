@@ -102,6 +102,7 @@ public class AdminOrgController {
         request.setNombrePlacesMax(action.getNombrePlacesMax());
         model.addAttribute("action", request);
         model.addAttribute("actionId", id);
+        model.addAttribute("imageActuelle", action.getImageUrl());
         model.addAttribute("categories", Categorie.values());
         model.addAttribute("typesAction", TypeAction.values());
         model.addAttribute("modeEdition", true);

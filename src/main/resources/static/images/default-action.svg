@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="360" viewBox="0 0 800 360">
+  <rect width="800" height="360" fill="#e8f5e9"/>
+  <rect x="0" y="0" width="800" height="6" fill="#4caf50"/>
+  <circle cx="400" cy="155" r="60" fill="#c8e6c9"/>
+  <text x="400" y="175" font-family="sans-serif" font-size="64" text-anchor="middle" fill="#4caf50">&#x2665;</text>
+  <text x="400" y="240" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#388e3c">Action Caritative</text>
+  <text x="400" y="268" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#81c784">Ensemble, faisons la différence</text>
+</svg>

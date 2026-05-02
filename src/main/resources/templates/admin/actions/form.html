@@ -39,7 +39,8 @@
                             <!-- Formulaire création -->
                             <form th:if="${!modeEdition}"
                                   th:action="@{/admin/actions/nouvelle}"
-                                  th:object="${action}" method="post" novalidate>
+                                  th:object="${action}" method="post"
+                                  enctype="multipart/form-data" novalidate>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Titre <span class="text-danger">*</span></label>
@@ -127,6 +128,18 @@
                                     <div class="invalid-feedback" th:errors="*{nombrePlacesMax}"></div>
                                 </div>
 
+                                <!-- Image -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Image de l'action</label>
+                                    <div class="text-center mb-2">
+                                        <img id="preview-create" src="/images/default-action.svg"
+                                             class="img-fluid rounded" style="max-height:160px;object-fit:cover;width:100%;">
+                                    </div>
+                                    <input type="file" class="form-control" name="image" accept="image/*"
+                                           onchange="previewImage(this, 'preview-create')">
+                                    <div class="form-text">JPG, PNG, WEBP — max 5 MB. Laissez vide pour l'image par défaut.</div>
+                                </div>
+
                                 <div class="d-grid gap-2 mt-4">
                                     <button type="submit" class="btn btn-success">
                                         <i class="bi bi-plus-circle me-1"></i> Créer l'action
@@ -138,7 +151,8 @@
                             <!-- Formulaire modification -->
                             <form th:if="${modeEdition}"
                                   th:action="@{'/admin/actions/' + ${actionId} + '/modifier'}"
-                                  th:object="${action}" method="post" novalidate>
+                                  th:object="${action}" method="post"
+                                  enctype="multipart/form-data" novalidate>
 
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Titre <span class="text-danger">*</span></label>
@@ -223,6 +237,19 @@
                                     <div class="invalid-feedback" th:errors="*{nombrePlacesMax}"></div>
                                 </div>
 
+                                <!-- Image -->
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Image de l'action</label>
+                                    <div class="text-center mb-2">
+                                        <img id="preview-edit"
+                                             th:src="${imageActuelle != null ? imageActuelle : '/images/default-action.svg'}"
+                                             class="img-fluid rounded" style="max-height:160px;object-fit:cover;width:100%;">
+                                    </div>
+                                    <input type="file" class="form-control" name="image" accept="image/*"
+                                           onchange="previewImage(this, 'preview-edit')">
+                                    <div class="form-text">Laissez vide pour conserver l'image actuelle.</div>
+                                </div>
+
                                 <div class="d-grid gap-2 mt-4">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-save me-1"></i> Enregistrer les modifications
@@ -248,6 +275,13 @@
         const type = selected ? selected.value : null;
         document.getElementById('champ-financier').style.display = (type === 'FINANCIER') ? 'block' : 'none';
         document.getElementById('champ-physique').style.display = (type === 'PHYSIQUE') ? 'block' : 'none';
+    }
+    function previewImage(input, previewId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => document.getElementById(previewId).src = e.target.result;
+            reader.readAsDataURL(input.files[0]);
+        }
     }
     document.addEventListener('DOMContentLoaded', toggleTypeFields);
 </script>

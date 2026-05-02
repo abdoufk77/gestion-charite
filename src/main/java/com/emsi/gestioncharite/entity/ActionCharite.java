@@ -39,6 +39,8 @@ public class ActionCharite {
     // Renseigné uniquement si typeAction == PHYSIQUE
     private Integer nombrePlacesMax;
 
+    private String imageUrl;
+
     @ManyToOne
     @JoinColumn(name = "organisation_id")
     private Organisation organisation;

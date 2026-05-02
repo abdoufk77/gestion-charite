@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -40,4 +41,6 @@ public class ActionChariteRequest {
 
     @Min(value = 1, message = "Le nombre de places doit être au moins 1")
     private Integer nombrePlacesMax;
+
+    private MultipartFile image;
 }
