@@ -9,10 +9,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +25,16 @@ import java.io.IOException;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,15 +63,15 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             )
-            // autoriser H2 console en dev
             .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
             .headers(headers -> headers
                 .frameOptions(frame -> frame.sameOrigin())
-                .cacheControl(Customizer.withDefaults()) // force no-cache sur toutes les pages protégées
+                .cacheControl(Customizer.withDefaults())
             )
-            .sessionManagement(session -> session
-                .sessionFixation().newSession()
-            );
+            .sessionManagement(session -> {
+                session.sessionFixation().newSession();
+                session.maximumSessions(-1).sessionRegistry(sessionRegistry());
+            });
 
         return http.build();
     }
@@ -68,7 +81,7 @@ public class SecurityConfig {
         return (HttpServletRequest request, HttpServletResponse response, Authentication authentication) -> {
             String role = authentication.getAuthorities().iterator().next().getAuthority();
             String redirectUrl = switch (role) {
-                case "ROLE_SUPER_ADMIN"        -> "/superadmin/dashboard";
+                case "ROLE_SUPER_ADMIN"        -> "/superadmin/home";
                 case "ROLE_ADMIN_ORGANISATION" -> "/admin/dashboard";
                 case "ROLE_DONATEUR"           -> "/donnateur/dashboard";
                 default                        -> "/home";

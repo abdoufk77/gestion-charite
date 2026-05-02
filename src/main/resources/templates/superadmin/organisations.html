@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Organisations — Super Admin</title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/admin-layout.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="admin-wrapper">
+
+    <div th:replace="~{superadmin/fragments/sidebar :: sidebar('organisations')}"></div>
+
+    <div class="admin-main">
+
+        <!-- Topbar -->
+        <div class="admin-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <h5 class="mb-0 fw-bold text-success">
+                    <i class="bi bi-building-fill me-2"></i>Organisations
+                </h5>
+                <span class="badge bg-success-subtle text-success fw-normal"
+                      th:text="${pageOrgs.totalElements} + ' au total'"></span>
+            </div>
+        </div>
+
+        <!-- Contenu scrollable -->
+        <div class="admin-content">
+
+            <!-- Alertes flash -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-x-circle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Stats compactes -->
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <span class="text-muted small">
+                    <i class="bi bi-building text-success me-1"></i>
+                    <strong th:text="${pageOrgs.totalElements}"></strong> organisation(s)
+                </span>
+                <span class="text-muted small">·</span>
+                <span class="text-muted small">
+                    <i class="bi bi-check-circle text-success me-1"></i>
+                    <strong th:text="${activeCount}"></strong> active(s)
+                </span>
+            </div>
+
+            <!-- Barre de recherche + filtre -->
+            <form th:action="@{/superadmin/organisations}" method="get"
+                  class="card border-0 shadow-sm mb-3 p-3">
+                <div class="row g-2 align-items-end">
+
+                    <div class="col-12 col-md-5">
+                        <label class="form-label small fw-semibold text-muted mb-1">Recherche</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" name="search" class="form-control border-start-0 ps-0"
+                                   th:value="${search}"
+                                   placeholder="Nom ou contact...">
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-semibold text-muted mb-1">Statut</label>
+                        <select name="statut" class="form-select">
+                            <option value="">Tous les statuts</option>
+                            <option th:each="s : ${statuts}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == statut}"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-success flex-grow-1">
+                            <i class="bi bi-funnel me-1"></i>Filtrer
+                        </button>
+                        <a th:href="@{/superadmin/organisations}"
+                           th:if="${search != '' || statut != null}"
+                           class="btn btn-outline-secondary" title="Réinitialiser">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+
+            <!-- Info résultats filtrés -->
+            <div th:if="${search != '' || statut != null}" class="text-muted small mb-2">
+                <i class="bi bi-funnel-fill me-1 text-success"></i>
+                Résultats filtrés :
+                <strong th:text="${pageOrgs.totalElements}"></strong> organisation(s)
+                <span th:if="${search != ''}"> pour "<em th:text="${search}"></em>"</span>
+                <span th:if="${statut != null}"> · statut <span class="badge bg-success" th:text="${statut}"></span></span>
+            </div>
+
+            <!-- Aucun résultat -->
+            <div th:if="${pageOrgs.totalElements == 0}" class="text-center py-5">
+                <i class="bi bi-search text-muted" style="font-size:2.5rem;"></i>
+                <p class="text-muted mt-3"
+                   th:text="${search != '' || statut != null} ? 'Aucune organisation ne correspond à votre recherche.' : 'Aucune organisation enregistrée.'"></p>
+                <a th:if="${search != '' || statut != null}"
+                   th:href="@{/superadmin/organisations}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-x-circle me-1"></i>Effacer les filtres
+                </a>
+            </div>
+
+            <!-- Tableau -->
+            <div th:if="${pageOrgs.totalElements > 0}">
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">#</th>
+                                    <th>Nom</th>
+                                    <th>Contact</th>
+                                    <th>Téléphone</th>
+                                    <th>N° Fiscal</th>
+                                    <th class="text-center">Statut organisation</th>
+                                    <th class="text-center">Compte admin</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="org : ${pageOrgs.content}">
+                                    <td class="ps-3 text-muted" th:text="${org.id}"></td>
+                                    <td class="fw-semibold" th:text="${org.nom}"></td>
+                                    <td th:text="${org.contactPrincipal}"></td>
+                                    <td th:text="${org.telephone}"></td>
+                                    <td th:text="${org.numIdentFiscale}"></td>
+
+                                    <td class="text-center">
+                                        <span th:switch="${org.statut?.name()}">
+                                            <span th:case="'ACTIVE'" class="badge bg-success">Active</span>
+                                            <span th:case="'SUSPENDUE'" class="badge bg-danger">Suspendue</span>
+                                            <span th:case="'EN_ATTENTE'" class="badge bg-warning text-dark">En attente</span>
+                                            <span th:case="'REJETEE'" class="badge bg-secondary">Rejetée</span>
+                                            <span th:case="*" class="badge bg-secondary">Inconnu</span>
+                                        </span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span th:if="${adminMap.containsKey(org.id)}">
+                                            <span th:if="${adminMap.get(org.id).enabled}" class="badge bg-success">
+                                                <i class="bi bi-person-check-fill me-1"></i>Actif
+                                            </span>
+                                            <span th:if="${!adminMap.get(org.id).enabled}" class="badge bg-secondary">
+                                                <i class="bi bi-person-slash me-1"></i>Désactivé
+                                            </span>
+                                        </span>
+                                        <span th:if="${!adminMap.containsKey(org.id)}" class="text-muted small">—</span>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                            <form th:if="${org.statut?.name() == 'ACTIVE' or org.statut?.name() == 'SUSPENDUE'}"
+                                                  th:action="@{/superadmin/organisations/{id}/toggle-statut(id=${org.id})}"
+                                                  method="post" class="d-inline">
+                                                <button th:if="${org.statut?.name() == 'ACTIVE'}" type="submit"
+                                                        class="btn btn-warning btn-sm"
+                                                        onclick="return confirm('Suspendre cette organisation ?')">
+                                                    <i class="bi bi-building-slash me-1"></i>Suspendre
+                                                </button>
+                                                <button th:if="${org.statut?.name() == 'SUSPENDUE'}" type="submit"
+                                                        class="btn btn-success btn-sm"
+                                                        onclick="return confirm('Réactiver cette organisation ?')">
+                                                    <i class="bi bi-building-check me-1"></i>Réactiver
+                                                </button>
+                                            </form>
+                                            <form th:if="${adminMap.containsKey(org.id)}"
+                                                  th:action="@{/superadmin/organisations/{id}/toggle-admin(id=${org.id})}"
+                                                  method="post" class="d-inline">
+                                                <button th:if="${adminMap.get(org.id).enabled}" type="submit"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        onclick="return confirm('Désactiver le compte admin ?')">
+                                                    <i class="bi bi-person-slash me-1"></i>Désact.
+                                                </button>
+                                                <button th:if="${!adminMap.get(org.id).enabled}" type="submit"
+                                                        class="btn btn-outline-success btn-sm"
+                                                        onclick="return confirm('Activer le compte admin ?')">
+                                                    <i class="bi bi-person-check me-1"></i>Act.
+                                                </button>
+                                            </form>
+                                            <span th:if="${!adminMap.containsKey(org.id)}"
+                                                  class="text-muted small">Pas de compte</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex align-items-center justify-content-between">
+                    <small class="text-muted">
+                        Page <strong th:text="${currentPage + 1}"></strong>
+                        sur <strong th:text="${pageOrgs.totalPages}"></strong>
+                        &mdash; <span th:text="${pageOrgs.totalElements}"></span> résultat(s)
+                    </small>
+
+                    <nav th:if="${pageOrgs.totalPages > 1}">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/superadmin/organisations(page=${currentPage - 1}, search=${search}, statut=${statut})}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item"
+                                th:each="i : ${#numbers.sequence(0, pageOrgs.totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/superadmin/organisations(page=${i}, search=${search}, statut=${statut})}"
+                                   th:text="${i + 1}"></a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage + 1 >= pageOrgs.totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                   th:href="@{/superadmin/organisations(page=${currentPage + 1}, search=${search}, statut=${statut})}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+
+        </div><!-- fin admin-content -->
+
+        <footer class="admin-footer">&copy; 2026 GestionCharité</footer>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

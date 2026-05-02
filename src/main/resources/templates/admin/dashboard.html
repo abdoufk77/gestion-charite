@@ -27,6 +27,17 @@
         <!-- Contenu scrollable -->
         <div class="admin-content">
 
+            <!-- Bannière suspension -->
+            <div th:if="${utilisateur.organisation != null and utilisateur.organisation.statut?.name() == 'SUSPENDUE'}"
+                 class="alert alert-danger d-flex align-items-start gap-3 mb-4 border-0 shadow-sm" role="alert"
+                 style="border-left: 4px solid #dc3545 !important;">
+                <i class="bi bi-exclamation-triangle-fill fs-4 flex-shrink-0 mt-1"></i>
+                <div>
+                    <div class="fw-bold fs-6 mb-1">Votre organisation est suspendue</div>
+                    <div class="small">L'accès à certaines fonctionnalités est restreint. Veuillez contacter l'administrateur principal pour plus d'informations.</div>
+                </div>
+            </div>
+
             <!-- Stat rapide -->
             <div class="row g-3 mb-4">
                 <div class="col-sm-6 col-lg-3">
